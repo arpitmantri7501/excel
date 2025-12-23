@@ -489,8 +489,16 @@ class Parser {
     switch (type) {
       // sharedString
       case 's':
-        value = _excel._sharedStrings
-            .value(int.parse(_parseValue(node.findElements('v').first)));
+        final index = int.parse(_parseValue(node.findElements('v').first));
+        final sharedString = _excel._sharedStrings.value(index);
+        if (sharedString == null) {
+          // Handle missing sharedString gracefully (out-of-bounds index)
+          // This can happen when files are edited in Microsoft Excel on Windows
+          print('Warning: Cell references non-existent sharedString at index $index');
+          value = '';
+        } else {
+          value = sharedString;
+        }
         break;
       // boolean
       case 'b':
